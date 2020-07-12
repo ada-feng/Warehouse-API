@@ -1,0 +1,182 @@
+
+
+all request and response bodies should be in json format
+
+Generic Failures:
+  *applicable to all type of actions listed below, WILL NOT BE LISTED AGAIN IN
+  EACH FALIURES SECTION
+
+  400:
+    possible response bodies:
+
+      1. {'Error:': 'Unknown HTTP method'}
+        the request method is not one of get, put, post or delete
+
+      2. {'Error:': "Illegal CONTENT_LENGTH"}
+        the CONTENT_LENGTH of request is somehow set to a
+        negative quantity
+
+      3. {'Error:': "Unexpected content type [the request header\
+        CONTENT_TYPE string], expects application/json; charset=utf-8"}
+        the client CONTENT_TYPE header is not "application/json; charset=utf-8"
+
+      4. {'Error:': "Unexpected content type"}
+        although the request header claims its content type is correct,
+        server cannot unpack it correctly using json and utf-8
+
+    404:
+     body: {'Error':'Invalid pathway'}
+      the pathway provided is not defined
+____________________________________________________________________________
+/parts
+____________________________________________________________________________
+GET
+  1. retrieve the quantity of an item in the inventory given its name
+      request:
+        include in the request body a key "name"
+            {"name":"an actual item's name"}
+              ex: {"name": "bananas"}
+      response:
+        Success:
+          200: one pair of key and value in a dictionary {"item name": "quantity}
+                ex: {"bananas":4}
+        Failures:
+          404:  {'Error':' 'No such item in the inventory'}
+              the name queried is not in the inventory
+
+  2. to retrieve the whole inventory
+          request:
+            no request body
+
+          response:
+            Success:
+              200: a dictionary that contains all items in the inventory,
+              the name is the key, quantity integers are values
+                {"item_name_1": quantity, "item_name_2": quantity}
+                ex: {"bananas":4, "pads":5}
+            Failures:
+              None
+
+
+  3. to get items based on boundaries(inclusive)
+        request:
+          in the request body, include keys "upper bound", "lower bound"
+          or both, that has value of strings in integer form or simple an integer
+          {"upper bound":"some number", "lower bound": an integer}
+          ex. {"upper bound":6, "lower bound": "1"}
+
+        response:
+          Success:
+            200: a dictionary of items that have quantity in the range specified,
+            the keys are strings of item name, values are integers
+              {"item_name_1": quantity, "item_name_2": quantity}
+              ex: {"bananas":4, "pads":5}
+
+          Special Case:
+            200:
+            {}
+              the api is not responsible for checking if upper bound is smaller
+              than lower bound, so will simply return an empty dictionary;
+              or if there aren't any items in the range given
+
+          Failures:
+            400
+              {'Error':"Invalid Boundary input, must be whole numbers"}
+              if the value of the 'upper bound' or 'lower bound' keys are not
+              strings convertable to integers, nor integers
+
+    4. If body do not contain valid keys:
+      400 Bad Request,
+      {"Error:"Meaningless body"}
+
+____________________________________________________________________________
+PUT/POST
+  update the quantity of one or more items in the inventory, regardless of
+  the previous status of the items, or decrease or increase the quantity
+  of an existing item
+
+  request:
+
+    1. {"an actual item's name":"some quantity", "another name":"some quantity"}
+    ex: {"bananas": "50", "apple": "2" } or {"apple": 6}
+    To replace or add items with desired quantities
+
+    2. {"item_name_1":"+15", "item_name_2": "-5"}
+    to increase or decrease an item's quantity, include a + or minus sign at the
+    beginning of the quantity string. Must be a string like "-5"or "+5", -5 will
+    be treated as trying to designate a negative value, +5 will be treated as updating
+    a positive integer
+
+    Note: If an item's name appear more than once in the body, only the last one will
+    be preserved
+
+
+  response:
+    Success:
+    200: a dictionary of items updated with new qauntitties
+      {"item_name_1": quantity, "item_name_2": quantity}
+      ex: {"bananas":4, "pads":5}
+
+    Failures:
+      400:
+        1.{'Error':"Cannot have negative quantities"}
+          if the resulted value from decrease is negative, or a negative integer was in
+          the value field
+        2. {'Error':'Cannot convert quantity to integer'}
+          if the string provided for quanitity field cannot be cast to an integer
+      404: {'Error': "Cannot increase or decrease non-existent item(s) in the inventory"}
+        when client try to increase or decrease an item that is not in the inventory
+______________________________________________________________
+DELETE
+      remove an item in the inventory given its name
+
+      request:
+        include in the request body json {"name":"an actual item's name"}
+        ex: {"name": "bananas"}
+
+      response:
+        Success:
+        200
+          body: an empty dictionary, {}
+        Failures:
+          404: {Error":"No such item in the inventory"}
+          when the name given to delete is not found
+
+____________________________________________________________________________
+/orders
+____________________________________________________________________________
+get
+    no body: all orders
+      response: {1:{'user name':"a", "date": "mm/dd/yyyy", 'total'= "98.75"},
+                2:{'user name':"a", "date": "08/19/2048", 'total'= "98.75"}, ...}
+
+    {'user name':"a username"} all orders placed by a user
+      response: {"date":"total"}
+                ex {"08/19/2048" : 51.2, "15/87/1560": 54}
+      fails: no 'user name' key in body
+
+put
+   {'find':{'user name':"a", "date": "05/18/2000", 'total'= "85.75"}, 'replace':
+   {'user name':"a", "date": "08/19/2048", 'total'= "98.75"} }
+   change an existing order
+   no response body
+   fails: cannot find such order
+          lack useful key(s)
+          wrong data format
+          cannot convert to float
+post
+  {'user name':"a", "date": "08/19/2048", 'total'= "98.75"}
+  add a new order
+  no response body
+  fails: lack useful key(s)
+         wrong data format
+         cannot convert to float
+
+delete:
+  same body format as post, delete orders instead, can miss a few
+  keys to delete more orders at once
+
+
+
+On my honor, I have neither given or received unauthorized aid.
+Leqi Feng
