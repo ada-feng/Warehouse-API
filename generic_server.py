@@ -21,7 +21,10 @@ def dispatch(environ, response):
     return [final_json.encode('utf-8')]
 
 if __name__ == '__main__':
-    storage_type = sys.argv[1]
+    if len(sys.argv) > 1:
+        storage_type = sys.argv[1]
+    else:
+        storage_type = '-d'
     application = dispatcher.Dispatcher(storage_type)
     httpd = make_server( '', 8000, dispatch )
     httpd.serve_forever()
