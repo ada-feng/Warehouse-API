@@ -21,7 +21,6 @@ class MyAppException( Exception):
 class Dispatcher(object):
     def __init__(self, argument):
         self.resources = [{"pathway": "/parts", "object":Parts(argument)}]
-        self.resources.append({"pathway": "/orders", "object":Orders()})
 
     @staticmethod
     def environChecker(environ):
