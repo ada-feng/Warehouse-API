@@ -12,12 +12,12 @@ class MyAppException( Exception):
     status = ''
     message = ''
     def __init__(self, statusORcopy, message =None):
-        if message==None:
+        if message == None:
             self.status = statusORcopy.status
-            self.message =statusORcopy.message
+            self.message = statusORcopy.message
         else:
             self.status = statusORcopy
-            self.message =message
+            self.message = message
 
 class Dispatcher(object):
     def __init__(self, argument):
@@ -34,18 +34,18 @@ class Dispatcher(object):
         length = 0
         if 'CONTENT_LENGTH' in environ and environ['CONTENT_LENGTH']!="":
             length = int( environ['CONTENT_LENGTH'])
-        if length<0:
+        if length < 0:
             raise MyAppException("400 Bad Request","Illegal CONTENT_LENGTH")
 
-        if environ['CONTENT_TYPE']!=expected_request_ctype:
+        if environ['CONTENT_TYPE'] != expected_request_ctype:
             raise MyAppException("400 Bad Request","Unexpected content type: "\
             +environ['CONTENT_TYPE'] +", expects "+ expected_request_ctype )
         return request_method, length
 
     def request(self, environ):
-        path =environ['PATH_INFO']
+        path = environ['PATH_INFO']
         request_method, length = self.environChecker( environ)
-        if length ==0:
+        if length == 0:
             body_dic = None
         else:
             body_encoded = environ['wsgi.input'].read(length)
@@ -156,7 +156,7 @@ class Orders(object):
 
 
     def request(self, request_method, body_dic):
-        result={}
+        result = {}
         if request_method == 'GET':
             result = self.handleGET(body_dic)
 
