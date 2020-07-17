@@ -28,7 +28,8 @@ Generic Failures:
      body: {'Error':'Invalid pathway'}
       the pathway provided is not defined
 ____________________________________________________________________________
-/parts
+/parts 
+to be implemented
 ____________________________________________________________________________
 GET
   1. retrieve the quantity of an item in the inventory given its name
