@@ -33,12 +33,12 @@ ____________________________________________________________________________
 GET
   1. retrieve the quantity of an item in the inventory given its name
       request:
-        include in the request body a key "name"
+        include in the request body a param "name"
             {"name":"an actual item's name"}
               ex: {"name": "bananas"}
       response:
         Success:
-          200: one pair of key and value in a dictionary {"item name": "quantity}
+          200: one pair of param and value in a dictionary {"item name": "quantity}
                 ex: {"bananas":4}
         Failures:
           404:  {'Error':' 'No such item in the inventory'}
@@ -51,7 +51,7 @@ GET
           response:
             Success:
               200: a dictionary that contains all items in the inventory,
-              the name is the key, quantity integers are values
+              the name is the param, quantity integers are values
                 {"item_name_1": quantity, "item_name_2": quantity}
                 ex: {"bananas":4, "pads":5}
             Failures:
@@ -60,7 +60,7 @@ GET
 
   3. to get items based on boundaries(inclusive)
         request:
-          in the request body, include keys "upper bound", "lower bound"
+          in the request body, include params "upper bound", "lower bound"
           or both, that has value of strings in integer form or simple an integer
           {"upper bound":"some number", "lower bound": an integer}
           ex. {"upper bound":6, "lower bound": "1"}
@@ -68,7 +68,7 @@ GET
         response:
           Success:
             200: a dictionary of items that have quantity in the range specified,
-            the keys are strings of item name, values are integers
+            the params are strings of item name, values are integers
               {"item_name_1": quantity, "item_name_2": quantity}
               ex: {"bananas":4, "pads":5}
 
@@ -82,10 +82,10 @@ GET
           Failures:
             400
               {'Error':"Invalid Boundary input, must be whole numbers"}
-              if the value of the 'upper bound' or 'lower bound' keys are not
+              if the value of the 'upper bound' or 'lower bound' params are not
               strings convertable to integers, nor integers
 
-    4. If body do not contain valid keys:
+    4. If body do not contain valid params:
       400 Bad Request,
       {"Error:"Meaningless body"}
 
@@ -153,7 +153,7 @@ get
     {'user name':"a username"} all orders placed by a user
       response: {"date":"total"}
                 ex {"08/19/2048" : 51.2, "15/87/1560": 54}
-      fails: no 'user name' key in body
+      fails: no 'user name' param in body
 
 put
    {'find':{'user name':"a", "date": "05/18/2000", 'total'= "85.75"}, 'replace':
@@ -161,20 +161,20 @@ put
    change an existing order
    no response body
    fails: cannot find such order
-          lack useful key(s)
+          lack useful param(s)
           wrong data format
           cannot convert to float
 post
   {'user name':"a", "date": "08/19/2048", 'total'= "98.75"}
   add a new order
   no response body
-  fails: lack useful key(s)
+  fails: lack useful param(s)
          wrong data format
          cannot convert to float
 
 delete:
   same body format as post, delete orders instead, can miss a few
-  keys to delete more orders at once
+  params to delete more orders at once
 
 
 
