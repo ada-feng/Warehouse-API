@@ -9,7 +9,7 @@ functions:
 3. Remove an item from the inventory
 
 versions:
-in the command line
--f for storing the inventory in a file
--d for storing in a sqlite database
+(in the command line)
+-f for storing the inventory in a file;
+-d for storing in a sqlite database;
 default: database
