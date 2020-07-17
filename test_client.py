@@ -1,32 +1,29 @@
-import http.client, pprint, sys, json
+import http.client, sys, json
 import unittest
 
 class inventory_client():
     expected_ctype = "application/json; charset=utf-8"
-    http_methods=["GET", "POST",'PUT','DELETE']
-    get_options =['get all','query with bounds','find a specific item']
+    http_methods = ["GET", "POST",'PUT','DELETE']
+    get_options = ['get all','query with bounds','find a specific item']
 
     def __init__(self):
         self.connection = http.client.HTTPConnection('localhost:8000')
 
     def httpmethod(self, method, path, body = None,\
-                    headers= {'Content-type':"application/json; charset=utf-8"} ):
+                    headers = {'Content-type':"application/json; charset=utf-8"} ):
 
         self.connection.request(method, path, body, headers)
         response = self.connection.getresponse()
         ctype = response.getheader('Content-type')
         status_code =  response.status
-        print (status_code)
-        if status_code>= 500:
+        if status_code >= 500:
             raise Exception("HTTP call failed: "+ str(status_code )+" "+ response.reason)
         if ctype != self.expected_ctype:
             raise Exception("Unexpected response content type "+ ctype)
         body_dic = json.loads( response.read().decode('utf-8') )
         if status_code != 200:
-            print (body_dic)
             raise Exception("HTTP call failed: "+ str(status_code )+" "\
             + response.reason + ", " + body_dic['Error'])
-        print(body_dic)
         return status_code, body_dic
 
     @staticmethod
@@ -115,8 +112,8 @@ class TestAPIResponse(unittest.TestCase):
         status, response_body  =  self.iv_client.httpmethod('get', self.path, \
         request_body_formatted)
         self.assertEqual(status, 200 )
-        self.assertTrue(response_body["a"] ==25)
-        self.assertTrue(response_body["b"] ==6)
+        self.assertTrue(response_body["a"] == 25)
+        self.assertTrue(response_body["b"] == 6)
         self.assertTrue("c" not in response_body)
 
     def testGetOnlyLowerBound(self):
@@ -128,9 +125,9 @@ class TestAPIResponse(unittest.TestCase):
         status, response_body  =  self.iv_client.httpmethod('get', self.path,\
          request_body_formatted)
         self.assertEqual(status, 200 )
-        self.assertTrue(response_body["a"] ==25)
+        self.assertTrue(response_body["a"] == 25)
         self.assertTrue("b" not in response_body)
-        self.assertTrue(response_body["c"] ==7)
+        self.assertTrue(response_body["c"] == 7)
 
     def testGetBothBounds(self):
         setup_dic = {"a": "17", "b":16, "c":"300", 'd':301}
@@ -141,9 +138,9 @@ class TestAPIResponse(unittest.TestCase):
         status, response_body  =  self.iv_client.httpmethod('get', self.path, \
         request_body_formatted)
         self.assertEqual(status, 200 )
-        self.assertTrue(response_body["a"] ==17)
+        self.assertTrue(response_body["a"] == 17)
         self.assertTrue("b" not in response_body)
-        self.assertTrue(response_body["c"] ==300)
+        self.assertTrue(response_body["c"] == 300)
         self.assertTrue("d" not in response_body)
 
     def testGetIllegalBounds(self):
