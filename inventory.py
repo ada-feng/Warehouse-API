@@ -1,16 +1,16 @@
 import json
 
-class InventoryException( Exception):
+class InventoryException( Exception ):
     status = ''
     message = ''
 
-    def __init__(self, statusORcopy, message =None):
-        if message==None:
+    def __init__(self, statusORcopy, message = None):
+        if message == None:
             self.status = statusORcopy.status
             self.message =statusORcopy.message
         else:
             self.status = statusORcopy
-            self.message =message
+            self.message = message
 
 class inventory:
     filename = 'inventory_data'
@@ -24,11 +24,9 @@ class inventory:
             self.myDic = {}
 
 
-    def increaseDecrease(self, temporary_dic, k, v):
-        #removes the starting + or minus
-        value_part = v[1:]
+    def increaseDecrease(self, temporary_dic, k, change_v):
         try:
-            value_int = int( value_part )
+            value_int = int( change_v )
         except:
             raise InventoryException('400 Bad Request', \
             'Cannot convert quantity to integer ')
@@ -37,15 +35,11 @@ class inventory:
             raise InventoryException("404 Not Found" , \
             "Cannot increase or decrease non-existent item(s) in the inventory")
         ori_v = self.myDic[k]
-        new_v = 0
-        if v.startswith("+"):
-            new_v = ori_v + value_int
-        #v starts with "-"
-        else:
-            new_v = ori_v - value_int
-            if new_v <0:
-                raise InventoryException("400 Bad Request"," \
-                Cannot have negative quantities")
+        new_v = ori_v + value_int
+ 
+        if new_v < 0:
+            raise InventoryException("400 Bad Request"," \
+            Cannot have negative quantities")
         temporary_dic[k] = new_v
         return temporary_dic
 
@@ -92,21 +86,21 @@ class inventory:
 
     def boundSearch(self, upperBound_str, lowerBound_str):
         try:
-            upperBound_int=self.boundToInt(upperBound_str)
-            lowerBound_int=self.boundToInt(lowerBound_str)
+            upperBound_int = self.boundToInt(upperBound_str)
+            lowerBound_int = self.boundToInt(lowerBound_str)
         except InventoryException as ex:
             raise InventoryException(ex)
         result_dic = {}
         for k, v in self.myDic.items():
             fulfilled = True
-            if upperBound_int !=None:
+            if upperBound_int != None:
                 if v > upperBound_int:
                     fulfilled = False
-            if lowerBound_int !=None:
+            if lowerBound_int != None:
                 if v < lowerBound_int:
                     fulfilled = False
             if(fulfilled):
-                result_dic[k]=v
+                result_dic[k] = v
         return result_dic
 
     @staticmethod
