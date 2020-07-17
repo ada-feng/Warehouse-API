@@ -1,8 +1,7 @@
 import json, signal, sys, re
 import urllib.parse
 import storage, storage_file, storage_db
-from order_history import history
-from order_history import OrderException as OEx
+
 
 
 httpMethods=["GET", "POST",'PUT','DELETE']
@@ -134,60 +133,3 @@ class Parts(object):
                 self.myInventory.save()
         return result
 
-class Orders(object):
-    myHistory = history()
-
-    def handleGET(self, body_dic):
-        result = {}
-        if body_dic == None:
-            result = self.myHistory.getAll()
-
-        elif 'user name' in body_dic:
-            username = body_dic['user name']
-            try:
-                result = self.myHistory.get(username)
-            except OEx as ex:
-                raise MyAppException(ex)
-
-        else: #body is not None, yet no useful parameters
-            raise MyAppException("400 Bad Request", "Meaningless body")
-        #if nothing goes wrong
-        return result
-
-
-    def request(self, request_method, body_dic):
-        result = {}
-        if request_method == 'GET':
-            result = self.handleGET(body_dic)
-
-        elif request_method == 'PUT':
-            if body_dic == None:
-                raise MyAppException("400 Bad Request", "This method require a body")
-            try:
-                self.myHistory.update(body_dic)
-            except OEx as ex:
-                raise MyAppException(ex)
-            finally:
-                self.myHistory.save()
-
-        elif request_method == 'POST':
-            if body_dic == None:
-                raise MyAppException("400 Bad Request", "This method require a body")
-                try:
-                    self.myHistory.addOrder(body_dic)
-                except OEx as ex:
-                    raise MyAppException(ex)
-                finally:
-                    self.myHistory.save()
-
-        #if request_method == 'DELETE'
-        else:
-            if body_dic == None:
-                raise MyAppException("400 Bad Request", "This method require a body")
-            try:
-                self.myHistory.remove(body_dic)
-            except OEx as ex:
-                raise MyAppException(ex)
-            finally:
-                self.myHistory.save()
-        return result
